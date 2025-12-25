@@ -46,7 +46,7 @@ app.get('/get-tasks', async function (req, res) {
 app.post('/create-task', async function (req, res) {
     let { task, dueDate } = req.body;
 
-
+console.log(dueDate)
 
     // validations
     let finalResult;
@@ -55,9 +55,20 @@ app.post('/create-task', async function (req, res) {
     if (!task) {
         err.push('Task is required');
     }
-    if(!dueDate){
+    if (!dueDate) {
         err.push('Due Date is required');
     }
+
+    let today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    let selectedDate = new Date(dueDate);
+    selectedDate.setHours(0, 0, 0, 0);
+
+    if (selectedDate < today) {
+        err.push('Due Date is invalid');
+    }
+
 
     if (err.length) {
         finalResult = {
@@ -77,9 +88,11 @@ app.post('/create-task', async function (req, res) {
         const [rows] = await db.promise().query('SELECT MAX(serial) AS max_no FROM task');
         const serial = (parseInt(rows[0].max_no) || 0) + 1;
         let status = "Pending"
-
+        let today = new Date();
+        let priority = "Low"
+// console.log(today)
         // new task insert karo
-        let userTask = await db.promise().query('INSERT INTO task (serial, task, dueDate, status) VALUES (?, ?, ?, ?)', [serial, task,dueDate, status]);
+        let userTask = await db.promise().query('INSERT INTO task (serial, task, adddate, dueDate, status, priority) VALUES (?, ?, ?, ?, ?, ?)', [serial, task, today, dueDate, status, priority]);
 
 
         finalResult = {
@@ -142,45 +155,110 @@ app.get('/delete-task/:id', async function (req, res) {
 })
 
 
-app.post('/status/:id', async function (req, res) {
+app.post('/statusUpdate/:id', async function (req, res) {
     let id = req.params.id;
-     
-    let {status} = req.body;    
-    
+
+    let { status } = req.body;
+
     let updateStatus = await db.promise().query('UPDATE task SET status = ? WHERE `id` = ?', [status, id]);
     res.send(updateStatus);
-    
+
+})
+
+app.post('/prioritystatus/:id', async function (req, res) {
+   let id = req.params.id;
+   let { priorityStatus } = req.body;
+
+    let updateStatus = await db.promise().query('UPDATE task SET priority = ? WHERE `id` = ?', [priorityStatus, id]);
+
+   res.send(updateStatus);    
 })
 
 app.get('/status/filter/:value', async function (req, res) {
     let taskStatus = req.params.value;
     // console.log(req.params.value);
 
-    if(taskStatus == "all"){
+    if (taskStatus == "all") {
         let result = {
-        taskStatus,
-        type: 'success',
-        table: '#tasks-table tbody',
-        message: 'tasks get successfully',
+            taskStatus,
+            type: 'success',
+            table: '#tasks-table tbody',
+            message: 'tasks get successfully',
 
+        }
+        res.send(result);
     }
-    res.send(result);
-    }
-    else{
-        let tasks = await db.promise().query('SELECT * FROM `task` WHERE `status` = ?',[taskStatus]);
-        
+    else {
+        let tasks = await db.promise().query('SELECT * FROM `task` WHERE `status` = ?', [taskStatus]);
+
         let result = {
             data: tasks[0],
             taskStatus,
             type: 'success',
             table: '#tasks-table tbody',
-            message: 'tasks get successfully',     
+            message: 'tasks get successfully',
         }
         res.send(result);
     }
-    
+
 });
 
+
+app.get('/day/status/filter/:value', async function (req, res) {
+    let dayFilter = req.params.value;   // today | week | month
+
+    if (dayFilter === 'today') {
+        let tasks = await db.promise().query('SELECT * FROM `task` WHERE DATE(duedate) = CURDATE()');
+        let result = {
+            data: tasks[0],
+            dayFilter,
+            type: 'success',
+            table: '#tasks-table tbody',
+            message: 'tasks get successfully',
+        }
+        res.send(result);
+
+    }
+    else if (dayFilter === 'week') {
+        let tasks = await db.promise().query('SELECT * FROM `task` WHERE YEARWEEK(duedate, 1) = YEARWEEK(CURDATE(), 1)');
+        let result = {
+            data: tasks[0],
+            dayFilter,
+            type: 'success',
+            table: '#tasks-table tbody',
+            message: 'tasks get successfully',
+        }
+        res.send(result);
+    }
+
+    else if (dayFilter === 'month') {
+        let tasks = await db.promise().query('SELECT * FROM `task` WHERE MONTH(duedate) = MONTH(CURDATE()) AND YEAR(duedate) = YEAR(CURDATE())');
+        let result = {
+            data: tasks[0],
+            dayFilter,
+            type: 'success',
+            table: '#tasks-table tbody',
+            message: 'tasks get successfully',
+        }
+        res.send(result);
+    }
+});
+
+
+app.get('/priority/status/filter/:value',async function(req,res){
+    let priorityFilter = req.params.value; 
+
+     let tasks = await db.promise().query('SELECT * FROM `task` WHERE `priority` = ?', [priorityFilter]);
+
+        let result = {
+            data: tasks[0],
+            priorityFilter,
+            type: 'success',
+            table: '#tasks-table tbody',
+            message: 'tasks get successfully',
+        }
+        res.send(result);
+})
 
 
 app.get('/task/:id', async function (req, res) {

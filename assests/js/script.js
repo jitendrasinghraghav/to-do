@@ -21,6 +21,7 @@ $(document).on('submit', '.form-submit', function (e) {
             // console.log(res);
             getResults('/get-tasks');
             tinymce.get('tiny').setContent('');
+            $('#dueDateInput').val('');
 
             res.swal && Swal.fire(res.swal);
         },
@@ -55,20 +56,51 @@ function getResults(url) {
 
 function taskTableData(tableId, data) {
     let rows = data.map(function (e) {
-        return (`<tr class="status-${e.status}">              
+        return (`<tr class="status-${e.status} priority-${e.Priority?.toLowerCase()}">              
                                 <td>${e.serial}</td>
                                 <td>${e.task}</td>
+                                <td>${e.AddDate.split('T')[0]}</td>
                                 <td>${e.dueDate.split('T')[0]}</td>
-                                <td>${e.status} 
-                                <button class="btn btn-primary  border-0" type="button" data-bs-toggle="dropdown">
-                                &#8942;
-                                 </button>
-                                    <ul class="dropdown-menu">
-                                      <li><a class="dropdown-item status" data-url="/status/${e.id}"  data-status="Working" href="#">Working</a></li>
-                                      <li><a class="dropdown-item status" data-url="/status/${e.id}"  data-status="Pause" href="#">Pause</a></li>
-                                      <li><a class="dropdown-item status" data-url="/status/${e.id}"  data-status="Testing" href="#">Testing</a></li>
-                                      <li><a class="dropdown-item status" data-url="/status/${e.id}"  data-status="Done" href="#">Done</a></li>
-                                    </ul>
+                                <td class="status-col">
+                                <div>${e.status}</div>
+                                <div>
+                                   <button class="btn btn-primary btn-sm border-0" type="button" data-bs-toggle="dropdown">
+                                   &#8801;
+                                   </button>
+                                   <ul class="dropdown-menu">
+                                   <li><a class="dropdown-item status" data-url="/statusUpdate/${e.id}"  data-status="Working">Working</a></li>
+                                   <li><a class="dropdown-item status" data-url="/statusUpdate/${e.id}"  data-status="Pause">Pause</a></li>
+                                   <li><a class="dropdown-item status" data-url="/statusUpdate/${e.id}"  data-status="Testing">Testing</a></li>
+                                   <li><a class="dropdown-item status" data-url="/statusUpdate/${e.id}"  data-status="Done">Done</a></li>
+                                   </ul>
+                                </div> 
+                                </td>
+
+                                <td class="priority-col">
+
+                                <div class="priority">
+                                <label class="priority-item">
+                                <input type="radio" class="priorityInput" data-url="/prioritystatus/${e.id}" data-status="High" name="priority_${e.id}" value="high"  ${e.Priority?.toLowerCase() === 'high' ? 'checked' : ''}>
+                                <span>High</span>
+                                </label>
+                                
+                                <label class="priority-item">
+                                <input type="radio" class="priorityInput" data-url="/prioritystatus/${e.id}" data-status="Medium" name="priority_${e.id}" value="medium"  ${e.Priority?.toLowerCase() === 'medium' ? 'checked' : ''}>
+                                <span>Med</span>
+                                </label>
+                                
+                                <label class="priority-item">
+                                  <input type="radio" class="priorityInput" data-url="/prioritystatus/${e.id}" data-status="Low" name="priority_${e.id}" value="low"  ${e.Priority?.toLowerCase() === 'low' ? 'checked' : ''}>
+                                    <span>Low</span>
+                                 </label>
+                                    </div>
+                                    <div class="priority-bar">
+                                      <span>${e.Priority}</span>
+                                     </div>
+                                  </td>
+
+                                  
+
                                 </td>
 
                                 <td>
@@ -77,7 +109,8 @@ function taskTableData(tableId, data) {
                                     <button class="btn btn-danger btn-sm row-delete" data-url="/delete-task/${e.id}"><i class="fa fa-trash"
                                             aria-hidden="true"></i></button>
                                 </td>
-                            </tr>`);
+                            </tr>`
+        );
     });
     $(tableId + ' tbody').html(rows.join(''));
 }
@@ -191,7 +224,7 @@ $(document).on('submit', '.modal-form-submit', function (e) {
 });
 
 
-// for Status
+// for Status Update
 $(document).on('click', '.status', function () {
 
     let url = $(this).data('url');
@@ -199,8 +232,8 @@ $(document).on('click', '.status', function () {
     // console.log(url, status);
     $.ajax({
         url,
-        type: 'POST',        
-        data: { status }, 
+        type: 'POST',
+        data: { status },
         // status,  
         dataType: 'json',
         success: function (res) {
@@ -213,20 +246,40 @@ $(document).on('click', '.status', function () {
     })
 });
 
+// for priority status
+$(document).on('click', '.priorityInput', function () {
+    let url = $(this).data('url');
+    let priorityStatus = $(this).data('status');
+    $.ajax({
+        url,
+        type: 'POST',
+        data: { priorityStatus },
+        // status,  
+        dataType: 'json',
+        success: function (res) {
+            console.log(res);
+            // getResults('/get-tasks');
+        },
+        error: function () {
+            console.log('Ajax error in status')
+        }
+    })
+});
 
-// for filter status
+
+// for filter status based on working status
 $(document).on('click', '.statusBtn', function () {
- let url = $(this).data('url');
-    
+    let url = $(this).data('url');
+
     $.ajax({
         url,
         success: function (res) {
-           let taskStatus= res.taskStatus;
+            let taskStatus = res.taskStatus;
             console.log(res.taskStatus);
-            if(taskStatus == "all"){
+            if (taskStatus == "all") {
                 getResults('/get-tasks');
             }
-            else{
+            else {
                 getResults(url);
             }
         },
@@ -236,6 +289,37 @@ $(document).on('click', '.statusBtn', function () {
     })
 });
 
+
+//for day filter status  based on due date
+$(document).on('click', '.dateStatusBtn', function () {
+    let url = $(this).data('url');
+    $.ajax({
+        url,
+        success: function (res) {
+            console.log(res)
+            getResults(url);
+        },
+        error: function () {
+            console.log('Ajax error in status')
+        }
+    })
+})
+
+
+//for Priority filter status  based on priority
+$(document).on('click', '.priorityStatusBtn', function () {
+    let url = $(this).data('url');
+    $.ajax({
+        url,
+        success: function (res) {
+            // console.log(res)
+            getResults(url);
+        },
+        error: function () {
+            console.log('Ajax error in status')
+        }
+    })
+});
 
 // for dark theme
 const toggleBtn = document.getElementById("themeToggle");
@@ -266,3 +350,10 @@ toggleBtn.addEventListener("click", () => {
 });
 
 
+// for priority bar
+$(document).on('change', '.priorityInput', function () {
+    let tr = $(this).closest('tr');
+
+    tr.removeClass('priority-high priority-medium priority-low');
+    tr.addClass('priority-' + this.value);
+});
