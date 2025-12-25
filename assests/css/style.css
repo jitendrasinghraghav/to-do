@@ -1,0 +1,38 @@
+ /* #tasks-table {
+    table-layout: fixed;
+    word-wrap: break-word;
+  } */
+
+ /* #tasks-table td {
+    white-space: normal !important;
+    word-break: break-word !important;
+    vertical-align: middle;
+  }  */
+
+  #tasks-table th, #tasks-table td {
+    max-width: 250px; /* you can adjust width */
+  } 
+
+  tr.status-Working td{
+    /* color: blue; */
+    /* font-weight: bold; */
+    background-color: rgb(62, 62, 236);
+    /* background-color: blue; */
+}
+
+tr.status-Done td{
+    /* color: green;  */
+    /* font-weight: bold; */
+    background-color: green;
+    /* font-size: 10px; */
+}
+
+tr.status-Testing td{
+    /* color: orange; */
+    background-color: orange;
+}
+
+tr.status-not-working td{
+  background-color: rgb(198, 219, 238);
+}
+   

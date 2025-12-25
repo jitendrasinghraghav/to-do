@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>To Do App</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+        integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body class="bg-light">
+
+    <div>
+        <button class="statusBtn" data-url="/status/filter/all">All Task</button>
+        <button class="statusBtn" data-url="/status/filter/pending">Pending</button>
+        <button class="statusBtn" data-url="/status/filter/working">Working</button>
+        <button class="statusBtn" data-url="/status/filter/pause">Pause</button>
+        <button class="statusBtn" data-url="/status/filter/testing">Testing</button>
+        <button class="statusBtn" data-url="/status/filter/done">Done</button>
+    </div>
+
+    <div class="card shadow-lg border-0 position-relative">
+        <div class="card-body">
+            <!-- your content -->
+            <div class="card shadow-lg border-0 position-relative">
+                <!-- 🔘 Theme Toggle Button -->
+                <button id="themeToggle"
+                    class="btn btn-outline-secondary btn-sm rounded-circle d-flex align-items-center justify-content-center position-absolute top-0 end-0 m-3"
+                    style="width: 40px; height: 40px;">
+                    🌙
+                </button>
+
+                <div class="card-body">
+                    <h1 class="text-center mb-4 text-primary fw-bold">📝 To Do List</h1>
+
+                    <!-- your form, table, etc. -->
+
+
+                    <!-- Task Add Form -->
+                    <form class="form-submit" action="/create-task" method="post">
+                        <div class="row justify-content-center">
+                            <div class="col-md-6 mb-3">
+                                <!-- <label for="taskInput" class="form-label fw-semibold">Create Task</label> -->
+                                <!-- <input type="text" id="taskInput" name="task" class="form-control"
+                                    placeholder="Enter your task"> -->
+
+
+
+                                <textarea id="tiny" name="task" class="form-control"></textarea>
+
+
+
+
+                                <label for="dueDateInput">Due Date</label>
+                                <input type="date" id="dueDateIput" name="dueDate" class="form-control"
+                                    placeholder="Enter Due Date">
+
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end mb-3">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="bi bi-plus-circle me-1"></i> Add Task
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Task Table -->
+                    <div class="table-responsive mt-4">
+                        <table class="table table-hover align-middle text-center" id="tasks-table">
+                            <thead class="table-primary">
+                                <tr>
+                                    <th scope="col">S. No.</th>
+                                    <th scope="col">Task</th>
+                                    <th scope="col">Due Date</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Dynamic rows go here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Update Task Modal -->
+        <div class="modal fade" id="task-modal" tabindex="-1" aria-labelledby="taskModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content border-0 shadow">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="taskModalLabel">Update Task</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form class="modal-form-submit" method="post">
+                            <div class="mb-3">
+                                <label for="updateTaskInput" class="form-label">Edit Task</label>
+                                <input type="text" id="updateTaskInput" name="task" class="form-control"
+                                    placeholder="Enter updated task">
+
+
+                                <!-- <textarea id="tiny" id="updateTaskInput" name="task" class="form-control"></textarea> -->
+
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Save Changes</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    </div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+        integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script src="js/script.js"></script>
+    <script>
+        getResults('/get-tasks');
+    </script>
+
+
+
+
+
+
+
+    <!-- for text area -->
+    <script src="https://cdn.tiny.cloud/1/un8bj2064z2j3lpirvxtrau6lmah3cl2p63sxwr4d4un9r2u/tinymce/8/tinymce.min.js"
+        referrerpolicy="origin" crossorigin="anonymous"></script>
+    <script>
+        tinymce.init({
+            selector: 'textarea#tiny',
+            height: 150,
+            menubar: false,     // 👈 File Edit View Insert Format sab gayab
+            statusbar: true,   // 👈 neeche wali bar bhi hat jayegi
+            branding: false,    // 👈 "Powered by Tiny" hatane ke liye
+            placeholder: 'Enter your task',   // 👈 yahi chahiye tha
+        });
+    </script>
+    <script>
+        // Prevent Bootstrap dialog from blocking focusin
+        document.addEventListener('focusin', (e) => {
+            if (e.target.closest(".tox-tinymce, .tox-tinymce-aux, .moxman-window, .tam-assetmanager-root") !== null) {
+                e.stopImmediatePropagation();
+            }
+        });
+    </script>
+
+</body>
+
+</html>
